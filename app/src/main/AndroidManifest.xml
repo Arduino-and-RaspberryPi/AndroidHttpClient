@@ -22,6 +22,10 @@
             android:name=".ViewServers"
             android:label="@string/title_activity_view_servers" >
         </activity>
+        <activity
+            android:name=".AddServer"
+            android:label="@string/title_activity_add_server" >
+        </activity>
     </application>
 
 </manifest>

@@ -12,10 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,15 +32,14 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     private Button btnNext;
     private Button btnSave;
     private Button btnDelete;
-    private Switch powerSwitch;
 
     private static final String SELECT_SQL = "SELECT * FROM servers";
 
     private SQLiteDatabase db;
 
     private Cursor c;
-    private Button button;//
-    private TextView outputText;//
+    private Button button;
+    private TextView outputText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,40 +48,12 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         setContentView(R.layout.activity_view_servers);
         openDatabase();
 
-        findViewsById();//
-        button.setOnClickListener(this);//
-
-        editTextId = (EditText) findViewById(R.id.editTextId);
-        editTextIP = (EditText) findViewById(R.id.editTextIP);
-        editTextPort = (EditText) findViewById(R.id.editTextPort);
-
-        btnPrev = (Button) findViewById(R.id.btnPrev);
-        btnNext = (Button) findViewById(R.id.btnNext);
-        btnSave = (Button) findViewById(R.id.btnSave);
-        btnDelete = (Button) findViewById(R.id.btnDelete);
-
+        findViewsById();
+        button.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         btnPrev.setOnClickListener(this);
         btnSave.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
-
-        powerSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    outputText.setText("Switch is currently ON");  //To change the text near to switch
-                }
-                else {
-                    outputText.setText("Switch is currently OFF");  //To change the text near to switch
-                }
-            }
-        });
-        if(powerSwitch.isChecked()){
-            outputText.setText("Switch is currently ON");
-        }
-        else {
-            outputText.setText("Switch is currently OFF");
-        }
 
         try {
             c = db.rawQuery(SELECT_SQL, null);
@@ -103,12 +71,19 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         }
     }
 
-    private void findViewsById() {//
+    private void findViewsById() {
+        editTextId = (EditText) findViewById(R.id.editTextId);
+        editTextIP = (EditText) findViewById(R.id.editTextIP);
+        editTextPort = (EditText) findViewById(R.id.editTextPort);
+
+        btnPrev = (Button) findViewById(R.id.btnPrev);
+        btnNext = (Button) findViewById(R.id.btnNext);
+        btnSave = (Button) findViewById(R.id.btnSave);
+        btnDelete = (Button) findViewById(R.id.btnDelete);
+
         button = (Button) findViewById(R.id.button);
         outputText = (TextView) findViewById(R.id.outputTxt);
-        powerSwitch = (Switch) findViewById(R.id.powerSwitch);
-        powerSwitch.setChecked(false);
-    }//
+    }
 
     protected void openDatabase() {
         db = openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
@@ -219,18 +194,8 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 
     @Override

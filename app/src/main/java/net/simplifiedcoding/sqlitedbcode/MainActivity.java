@@ -2,25 +2,28 @@ package net.simplifiedcoding.sqlitedbcode;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
+import android.util.Log;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
-
-    private EditText editTextName;
-    private EditText editTextAdd;
-    private Button btnAdd;
-    private Button btnView;
+    private Button addNew;
+    ServerCustomAdapter serverAdapter;
+    ListView serverList;
 
     private SQLiteDatabase db;
+
+    ArrayList<Server> serverArray = new ArrayList<Server>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,73 +32,57 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         createDatabase();
 
-        editTextName = (EditText) findViewById(R.id.editTextName);
-        editTextAdd = (EditText) findViewById(R.id.editTextAddress);
+        addNew = (Button) findViewById(R.id.addNew);
+        addNew.setOnClickListener(this);
 
-        btnAdd = (Button) findViewById(R.id.btnAdd);
-        btnView = (Button) findViewById(R.id.btnView);
+        serverArray.add(new Server("Mumer", "12.34.56", "90"));
+        serverArray.add(new Server("Jon", "12.45.23.90", "9000"));
+        serverArray.add(new Server("Broom", "09.231.12", "8080"));
+        serverArray.add(new Server("Lee", "1.234.7.8", "9001"));
+        serverArray.add(new Server("Jon", "45.78.12.34", "5000"));
+        serverArray.add(new Server("Broom", "123.4.21.2", "4040"));
+        serverArray.add(new Server("Lee", "76.12.56.43", "2003"));
 
-        btnAdd.setOnClickListener(this);
-        btnView.setOnClickListener(this);
+        serverAdapter = new ServerCustomAdapter(MainActivity.this, R.layout.row, serverArray);
+        serverList = (ListView) findViewById(R.id.listView);
+        serverList.setItemsCanFocus(false);
+        serverList.setAdapter(serverAdapter);
+
+        serverList.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    final int position, long id) {
+                Log.i("List View Clicked", "**********");
+                Toast.makeText(MainActivity.this,
+                        "List View Clicked:" + position, Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
+
     }
-
 
     protected void createDatabase(){
         db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ip VARCHAR,port VARCHAR);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ip VARCHAR,port VARCHAR, name varchar);");
     }
-
-    protected void insertIntoDB(){
-        String name = editTextName.getText().toString().trim();
-        String add = editTextAdd.getText().toString().trim();
-        if(name.equals("") || add.equals("")){
-            Toast.makeText(getApplicationContext(),"Please fill all fields", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        String query = "INSERT INTO servers (ip,port" +
-                ") VALUES('"+name+"', '"+add+"');";
-        db.execSQL(query);
-        Toast.makeText(getApplicationContext(),"Saved Successfully", Toast.LENGTH_LONG).show();
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    private void showServers(){
-        Intent intent = new Intent(this,ViewServers.class);
+    private void showAddServers(){
+        Intent intent = new Intent(this,AddServer.class);
         startActivity(intent);
         finish();
     }
 
     @Override
-    public void onClick(View v) {
-        if(v == btnAdd){
-            insertIntoDB();
-        }
-        if (v == btnView) {
-            showServers();
+    public void onClick(View view) {
+        if(view == addNew){
+            showAddServers();
         }
     }
 }
