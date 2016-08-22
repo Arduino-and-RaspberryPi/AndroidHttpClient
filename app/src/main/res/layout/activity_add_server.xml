@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="IP Address"
+        android:text="Name"
         android:id="@+id/textViewName" />
 
     <EditText
@@ -20,13 +20,24 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Port"
-        android:id="@+id/textViewAddress" />
+        android:text="IP Address"
+        android:id="@+id/textViewIP" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextAddress" />
+        android:id="@+id/editTextIP" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Port"
+        android:id="@+id/textViewPort" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextPort" />
 
     <Button
         style="?android:attr/buttonStyleSmall"

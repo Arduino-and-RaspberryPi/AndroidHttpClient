@@ -2,6 +2,7 @@ package net.simplifiedcoding.sqlitedbcode;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -22,6 +23,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     ListView serverList;
 
     private SQLiteDatabase db;
+    private static final String SELECT_SQL = "SELECT * FROM servers";
 
     ArrayList<Server> serverArray = new ArrayList<Server>();
 
@@ -35,13 +37,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         addNew = (Button) findViewById(R.id.addNew);
         addNew.setOnClickListener(this);
 
-        serverArray.add(new Server("Mumer", "12.34.56", "90"));
-        serverArray.add(new Server("Jon", "12.45.23.90", "9000"));
-        serverArray.add(new Server("Broom", "09.231.12", "8080"));
-        serverArray.add(new Server("Lee", "1.234.7.8", "9001"));
-        serverArray.add(new Server("Jon", "45.78.12.34", "5000"));
-        serverArray.add(new Server("Broom", "123.4.21.2", "4040"));
-        serverArray.add(new Server("Lee", "76.12.56.43", "2003"));
+        getResults();
 
         serverAdapter = new ServerCustomAdapter(MainActivity.this, R.layout.row, serverArray);
         serverList = (ListView) findViewById(R.id.listView);
@@ -55,7 +51,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                                     final int position, long id) {
                 Log.i("List View Clicked", "**********");
                 Toast.makeText(MainActivity.this,
-                        "List View Clicked:" + position, Toast.LENGTH_LONG)
+                        "List View Clicked:" + position, Toast.LENGTH_SHORT)
                         .show();
             }
         });
@@ -64,13 +60,29 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     protected void createDatabase(){
         db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ip VARCHAR,port VARCHAR, name varchar);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)));");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    private void getResults() {
+        Cursor cursor = db.rawQuery(SELECT_SQL, null);
+        if(cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(cursor.getColumnIndex("name"));
+                String ip = cursor.getString(cursor.getColumnIndex("ip"));
+                String port = cursor.getString(cursor.getColumnIndex("port"));
+                int status = cursor.getInt(cursor.getColumnIndex("status"));
+                serverArray.add(new Server(name, ip, port, status));
+            }
+        }
+
+        cursor.close();
+        db.close();
     }
 
     private void showAddServers(){

@@ -3,7 +3,7 @@ package net.simplifiedcoding.sqlitedbcode;
 import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
+import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,6 +18,9 @@ import android.widget.Toast;
 public class ServerCustomAdapter extends ArrayAdapter<Server> {
     Context context;
     int layoutResourceId;
+
+    private SQLiteDatabase db;
+
     ArrayList<Server> data = new ArrayList<Server>();
 
     public ServerCustomAdapter(Context context, int layoutResourceId,
@@ -32,7 +35,6 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         ServerHolder holder = null;
-
         if (row == null) {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
@@ -43,52 +45,52 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
             holder.editButton = (Button) row.findViewById(R.id.editButton);
             holder.powerSwitch = (Switch) row.findViewById(R.id.powerSwitch);
             row.setTag(holder);
-        } else {
+        }
+        else {
             holder = (ServerHolder) row.getTag();
         }
-        Server user = data.get(position);
-        holder.textName.setText(user.getName());
-        holder.textIP.setText(user.getIp());
-        holder.textPort.setText(user.getPort());
-        holder.powerSwitch.setChecked(false);
+        final Server server = data.get(position);
+        holder.textName.setText(server.getName());
+        holder.textIP.setText(server.getIp());
+        holder.textPort.setText(server.getPort());
+        Boolean switchStatus = server.getStatus() == 1 ? true : false;
+        holder.powerSwitch.setChecked(switchStatus);
         holder.editButton.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
-                Log.i("Edit Button Clicked", "**********");
                 Toast.makeText(context, "Edit button Clicked",
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
             }
         });
         holder.powerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                openDatabase();
                 if(isChecked) {
+                    String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
+                                server.getIp() + "' AND port='" + server.getPort() +"';";
+                    db.execSQL(sql);
                     Toast.makeText(context,
-                            "Switch is currently ON",
-                            Toast.LENGTH_LONG).show();
+                            "Power is ON",
+                            Toast.LENGTH_SHORT).show();
                 }
                 else {
+                    String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
+                            server.getIp() + "' AND port='" + server.getPort() +"';";
+                    db.execSQL(sql);
                     Toast.makeText(context,
-                            "Switch is currently OFF",
-                            Toast.LENGTH_LONG).show();
+                            "Power is OFF",
+                            Toast.LENGTH_SHORT).show();
                 }
+                db.close();
             }
         });
+        return row;
 
-        if(holder.powerSwitch.isChecked()){
-            Toast.makeText(context,
-                    "Switch is currently ON",
-                    Toast.LENGTH_LONG).show();
-        }
-        else {
-            Toast.makeText(context,
-                    "Switch is currently OFF",
-                    Toast.LENGTH_LONG).show();
-        }
+    }
 
-            return row;
-
+    protected void openDatabase() {
+        db = SQLiteDatabase.openDatabase(context.getDatabasePath("ServerConfigDB").toString(), null, SQLiteDatabase.CREATE_IF_NECESSARY);
     }
 
     static class ServerHolder {

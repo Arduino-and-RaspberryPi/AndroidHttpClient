@@ -1,9 +1,10 @@
 package net.simplifiedcoding.sqlitedbcode;
 
 public class Server {
-    String ip;
-    String port;
-    String name;
+    private String ip;
+    private String port;
+    private String name;
+    private int status;
 
     public String getName() {
         return name;
@@ -25,15 +26,24 @@ public class Server {
         return port;
     }
 
-    public void setPort(String location) {
-        this.port = location;
+    public void setPort(String port) {
+        this.port = port;
     }
 
-    public Server(String ip, String port, String name) {
+    public int getStatus(){
+        return status;
+    }
+
+    public void setStatus(int status){
+        this.status = status;
+    }
+
+    public Server(String name, String ip, String port, int status) {
         super();
-        this.name = ip;
-        this.ip = port;
-        this.port = name;
+        this.name = name;
+        this.ip = ip;
+        this.port = port;
+        this.status = status;
     }
 
 }

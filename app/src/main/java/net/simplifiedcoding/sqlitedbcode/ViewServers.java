@@ -9,11 +9,9 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -26,7 +24,9 @@ import java.net.URLConnection;
 
 public class ViewServers extends ActionBarActivity implements View.OnClickListener{
     private EditText editTextIP;
+    private EditText editTextName;
     private EditText editTextPort;
+    private EditText editTextStatus;
     private EditText editTextId;
     private Button btnPrev;
     private Button btnNext;
@@ -37,9 +37,8 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
     private SQLiteDatabase db;
 
-    private Cursor c;
+    private Cursor cursor;
     private Button button;
-    private TextView outputText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +55,8 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         btnDelete.setOnClickListener(this);
 
         try {
-            c = db.rawQuery(SELECT_SQL, null);
-            c.moveToFirst();
+            cursor = db.rawQuery(SELECT_SQL, null);
+            cursor.moveToFirst();
             showRecords();
         } catch (Exception e) {
             runOnUiThread(new Runnable() {
@@ -65,7 +64,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
                 public void run() {
                     Toast.makeText(getApplicationContext(),
                             "No records found.",
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -73,8 +72,10 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
     private void findViewsById() {
         editTextId = (EditText) findViewById(R.id.editTextId);
+        editTextName = (EditText) findViewById(R.id.editTextName);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
+        editTextStatus = (EditText) findViewById(R.id.editTextStatus);
 
         btnPrev = (Button) findViewById(R.id.btnPrev);
         btnNext = (Button) findViewById(R.id.btnNext);
@@ -82,7 +83,6 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         btnDelete = (Button) findViewById(R.id.btnDelete);
 
         button = (Button) findViewById(R.id.button);
-        outputText = (TextView) findViewById(R.id.outputTxt);
     }
 
     protected void openDatabase() {
@@ -90,18 +90,23 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     }
 
     protected void showRecords() {
-        String id = c.getString(0);
-        String ip = c.getString(1);
-        String port = c.getString(2);
+        String id = cursor.getString(0);
+        String name = cursor.getString(cursor.getColumnIndex("name"));
+        String ip = cursor.getString(cursor.getColumnIndex("ip"));
+        String port = cursor.getString(cursor.getColumnIndex("port"));
+        int status = cursor.getInt(cursor.getColumnIndex("status"));
         editTextId.setText(id);
+        editTextName.setText(name);
         editTextIP.setText(ip);
         editTextPort.setText(port);
+        String switchStatus =  (status == 1) ? "ON" : "OFF";
+        editTextStatus.setText(switchStatus);
     }
 
     protected void moveNext() {
         try {
-            if (!c.isLast())
-                c.moveToNext();
+            if (!cursor.isLast())
+                cursor.moveToNext();
 
             showRecords();
         } catch (Exception e) {
@@ -110,7 +115,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
                 public void run() {
                     Toast.makeText(getApplicationContext(),
                             "No next records found.",
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -119,8 +124,8 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
     protected void movePrev() {
         try {
-            if (!c.isFirst())
-                c.moveToPrevious();
+            if (!cursor.isFirst())
+                cursor.moveToPrevious();
 
             showRecords();
         } catch (Exception e) {
@@ -129,7 +134,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
                 public void run() {
                     Toast.makeText(getApplicationContext(),
                             "No previous records found.",
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -138,21 +143,23 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
 
     protected void saveRecord() {
-        String ip = editTextIP.getText().toString().trim();
-        String port = editTextPort.getText().toString().trim();
         String id = editTextId.getText().toString().trim();
+        String ip = editTextIP.getText().toString().trim();
+        String name = editTextName.getText().toString().trim();
+        String port = editTextPort.getText().toString().trim();
+        String status = editTextStatus.getText().toString().trim();
 
-        String sql = "UPDATE servers SET ip='" + ip + "', port='" + port + "' WHERE id=" + id + ";";
+        String sql = "UPDATE servers SET name='" + name + "',ip='" + ip + "', port='" + port + "', status='" + status + "' WHERE id=" + id + ";";
 
         if (ip.equals("") || port.equals("")) {
-            Toast.makeText(getApplicationContext(), "You cannot save blank values", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "You cannot save blank values", Toast.LENGTH_SHORT).show();
             return;
         }
 
         db.execSQL(sql);
-        Toast.makeText(getApplicationContext(), "Records Saved Successfully", Toast.LENGTH_LONG).show();
-        c = db.rawQuery(SELECT_SQL, null);
-        c.moveToPosition(Integer.parseInt(id));
+        Toast.makeText(getApplicationContext(), "Records Saved Successfully", Toast.LENGTH_SHORT).show();
+        cursor = db.rawQuery(SELECT_SQL, null);
+        cursor.moveToPosition(Integer.parseInt(id));
     }
 
     private void deleteRecord() {
@@ -167,8 +174,8 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
                         String sql = "DELETE FROM servers WHERE id=" + id + ";";
                         db.execSQL(sql);
-                        Toast.makeText(getApplicationContext(), "Record Deleted", Toast.LENGTH_LONG).show();
-                        c = db.rawQuery(SELECT_SQL, null);
+                        Toast.makeText(getApplicationContext(), "Record Deleted", Toast.LENGTH_SHORT).show();
+                        cursor = db.rawQuery(SELECT_SQL, null);
                     }
                 });
 
@@ -188,7 +195,6 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_view_servers, menu);
         return true;
     }
@@ -199,23 +205,23 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     }
 
     @Override
-    public void onClick(View v) {
-        if (v == btnNext) {
+    public void onClick(View view) {
+        if (view == btnNext) {
             moveNext();
         }
 
-        if (v == btnPrev) {
+        if (view == btnPrev) {
             movePrev();
         }
 
-        if (v == btnSave) {
+        if (view == btnSave) {
             saveRecord();
         }
 
-        if (v == btnDelete) {
+        if (view == btnDelete) {
             deleteRecord();
         }
-        if (v == button) {
+        if (view == button) {
             String ip = editTextIP.getText().toString().trim();
             String port = editTextPort.getText().toString().trim();
             String URL = "http://"+ip+":"+port+"/on$";
@@ -270,9 +276,9 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
             return stream;
         }
 
-        @Override
-        protected void onPostExecute(String output) {
-            outputText.setText(output);
-        }
+//        @Override
+//        protected void onPostExecute(String output) {
+//            outputText.setText(output);
+//        }
     }
 }

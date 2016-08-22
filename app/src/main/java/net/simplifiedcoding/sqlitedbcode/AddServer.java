@@ -12,7 +12,8 @@ import android.widget.Toast;
 
 public class AddServer extends ActionBarActivity implements View.OnClickListener {
     private EditText editTextName;
-    private EditText editTextAdd;
+    private EditText editTextIP;
+    private EditText editTextPort;
     private Button btnAdd;
     private Button btnView;
 
@@ -23,10 +24,9 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_server);
 
-//        createDatabase();
-
         editTextName = (EditText) findViewById(R.id.editTextName);
-        editTextAdd = (EditText) findViewById(R.id.editTextAddress);
+        editTextIP = (EditText) findViewById(R.id.editTextIP);
+        editTextPort = (EditText) findViewById(R.id.editTextPort);
 
         btnAdd = (Button) findViewById(R.id.btnAdd);
         btnView = (Button) findViewById(R.id.btnView);
@@ -36,23 +36,26 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
     }
 
 
-    protected void createDatabase(){
+    protected void openOrCreateDatabase(){
         db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ip VARCHAR,port VARCHAR);");
     }
 
     protected void insertIntoDB(){
+        openOrCreateDatabase();
         String name = editTextName.getText().toString().trim();
-        String add = editTextAdd.getText().toString().trim();
-        if(name.equals("") || add.equals("")){
-            Toast.makeText(getApplicationContext(),"Please fill all fields", Toast.LENGTH_LONG).show();
+        String ip = editTextIP.getText().toString().trim();
+        String port = editTextPort.getText().toString().trim();
+        String status = "0";
+        if(name.equals("") || ip.equals("") || port.equals("")){
+            Toast.makeText(getApplicationContext(),"Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String query = "INSERT INTO servers (ip,port" +
-                ") VALUES('"+name+"', '"+add+"');";
+        String query = "INSERT INTO servers (name, ip, port, status" +
+                ") VALUES('"+name+"', '"+ip+"', '"+port+"', '"+status+"');";
         db.execSQL(query);
-        Toast.makeText(getApplicationContext(),"Saved Successfully", Toast.LENGTH_LONG).show();
+        db.close();
+        Toast.makeText(getApplicationContext(),"Saved Successfully", Toast.LENGTH_SHORT).show();
     }
 
     private void showServers(){

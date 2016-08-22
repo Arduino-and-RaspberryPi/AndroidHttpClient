@@ -34,6 +34,7 @@
         android:layout_marginTop="5dp"
         android:text="Port" />
 
+
     <Switch
         android:id="@+id/powerSwitch"
         android:layout_width="102dp"
