@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SQLiteDBCode</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_view_servers">ViewAll</string>
+            <string name="hello">Accessing Servlet from Android</string>
+            <string name="button">On/Off</string>
+</resources>
