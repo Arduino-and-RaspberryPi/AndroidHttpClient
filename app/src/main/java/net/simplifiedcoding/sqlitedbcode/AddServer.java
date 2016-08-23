@@ -23,7 +23,12 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_server);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        initializeViews();
+    }
+
+    private void initializeViews(){
         editTextName = (EditText) findViewById(R.id.editTextName);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);

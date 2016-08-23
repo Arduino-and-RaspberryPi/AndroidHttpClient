@@ -20,11 +20,21 @@
         </activity>
         <activity
             android:name=".ViewServers"
-            android:label="@string/title_activity_view_servers" >
+            android:label="@string/title_activity_view_servers"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"
+                />
         </activity>
         <activity
             android:name=".AddServer"
-            android:label="@string/title_activity_add_server" >
+            android:label="@string/title_activity_add_server"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"
+                />
         </activity>
     </application>
 

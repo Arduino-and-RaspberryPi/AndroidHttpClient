@@ -15,10 +15,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -108,8 +106,6 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
 
     private class HttpGetRequest extends AsyncTask<String, Void, String> {
 
-        private Exception exceptionToBeThrown;
-
         @Override
         protected String doInBackground(String... urls) {
             try {
@@ -120,7 +116,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 return output;
             }
             catch (Exception ex){
-                exceptionToBeThrown = ex;
+                ex.printStackTrace();
             }
             return null;
         }
@@ -156,7 +152,6 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                exceptionToBeThrown = ex;
             }
             return stream;
         }

@@ -35,6 +35,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_servers);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initializeViews();
 
         Bundle extras = getIntent().getExtras();
