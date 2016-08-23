@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,23 +28,24 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     private SQLiteDatabase db;
 
     private Cursor cursor;
+    private int position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_servers);
-        openDatabase();
+        initializeViews();
 
-        findViewsById();
-        btnNext.setOnClickListener(this);
-        btnPrev.setOnClickListener(this);
-        btnSave.setOnClickListener(this);
-        btnDelete.setOnClickListener(this);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            position = extras.getInt("SERVER", position);
+        }
 
         try {
+            openDatabase();
             cursor = db.rawQuery(SELECT_SQL, null);
-            cursor.moveToFirst();
+            cursor.moveToPosition(position);
             showRecords();
         } catch (Exception e) {
             runOnUiThread(new Runnable() {
@@ -59,7 +59,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         }
     }
 
-    private void findViewsById() {
+    private void initializeViews() {
         editTextId = (EditText) findViewById(R.id.editTextId);
         editTextName = (EditText) findViewById(R.id.editTextName);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
@@ -70,6 +70,11 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         btnNext = (Button) findViewById(R.id.btnNext);
         btnSave = (Button) findViewById(R.id.btnSave);
         btnDelete = (Button) findViewById(R.id.btnDelete);
+
+        btnNext.setOnClickListener(this);
+        btnPrev.setOnClickListener(this);
+        btnSave.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
     }
 
     protected void openDatabase() {
@@ -77,7 +82,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     }
 
     protected void showRecords() {
-        String id = cursor.getString(0);
+        String id = cursor.getString(cursor.getColumnIndex("id"));
         String name = cursor.getString(cursor.getColumnIndex("name"));
         String ip = cursor.getString(cursor.getColumnIndex("ip"));
         String port = cursor.getString(cursor.getColumnIndex("port"));
@@ -178,12 +183,6 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_view_servers, menu);
-        return true;
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -50,7 +51,6 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
             holder.textName = (TextView) row.findViewById(R.id.textViewName);
             holder.textIP = (TextView) row.findViewById(R.id.textViewIP);
             holder.textPort = (TextView) row.findViewById(R.id.textViewPort);
-            holder.editButton = (Button) row.findViewById(R.id.editButton);
             holder.powerSwitch = (Switch) row.findViewById(R.id.powerSwitch);
             row.setTag(holder);
         }
@@ -63,34 +63,26 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         holder.textPort.setText(server.getPort());
         Boolean switchStatus = server.getStatus() == 1 ? true : false;
         holder.powerSwitch.setChecked(switchStatus);
-        holder.editButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "Edit button Clicked",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
         holder.powerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 openDatabase();
-                if(isChecked) {
-                    String URL = "http://"+server.getIp()+":"+server.getPort()+"/on$";
+                if (isChecked) {
+                    String URL = "http://" + server.getIp() + ":" + server.getPort() + "/on$";
                     HttpGetRequest task = new HttpGetRequest();
-                    task.execute(new String[] { URL });
+                    task.execute(new String[]{URL});
                     String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
-                            server.getIp() + "' AND port='" + server.getPort() +"';";
+                            server.getIp() + "' AND port='" + server.getPort() + "';";
                     db.execSQL(sql);
                     Toast.makeText(context,
                             "Power is ON",
                             Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    String URL = "http://"+server.getIp()+":"+server.getPort()+"/off$";
+                } else {
+                    String URL = "http://" + server.getIp() + ":" + server.getPort() + "/off$";
                     HttpGetRequest task = new HttpGetRequest();
-                    task.execute(new String[] { URL });
+                    task.execute(new String[]{URL});
                     String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
-                            server.getIp() + "' AND port='" + server.getPort() +"';";
+                            server.getIp() + "' AND port='" + server.getPort() + "';";
                     db.execSQL(sql);
                     Toast.makeText(context,
                             "Power is OFF",
@@ -111,19 +103,26 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         TextView textName;
         TextView textIP;
         TextView textPort;
-        Button editButton;
         Switch powerSwitch;
     }
 
     private class HttpGetRequest extends AsyncTask<String, Void, String> {
 
+        private Exception exceptionToBeThrown;
+
         @Override
         protected String doInBackground(String... urls) {
-            String output = null;
-            for (String url : urls) {
-                output = getOutputFromUrl(url);
+            try {
+                String output = null;
+                for (String url : urls) {
+                    output = getOutputFromUrl(url);
+                }
+                return output;
             }
-            return output;
+            catch (Exception ex){
+                exceptionToBeThrown = ex;
+            }
+            return null;
         }
 
         private String getOutputFromUrl(String url) {
@@ -135,8 +134,8 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 String s = "";
                 while ((s = buffer.readLine()) != null)
                     output.append(s);
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
             return output.toString();
         }
@@ -157,13 +156,16 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                exceptionToBeThrown = ex;
             }
             return stream;
         }
 
-//        @Override
-//        protected void onPostExecute(String output) {
-//            outputText.setText(output);
-//        }
+        @Override
+        protected void onPostExecute(String output) {
+            Toast.makeText(context,
+                    "Server is not responding",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }

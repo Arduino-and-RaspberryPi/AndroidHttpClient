@@ -74,23 +74,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Previous"
+            android:clickable="true"
             android:id="@+id/btnPrev"
-            android:layout_weight="0.20" />
+            android:layout_weight="0.33" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save"
+            android:clickable="true"
             android:id="@+id/btnSave"
-            android:layout_weight="0.27" />
+            android:layout_weight="0.33" />
 
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Next"
+            android:clickable="true"
             android:id="@+id/btnNext"
-            android:layout_weight="0.31" />
+            android:layout_weight="0.33" />
 
     </LinearLayout>
 
@@ -98,6 +101,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Delete"
+        android:clickable="true"
         android:id="@+id/btnDelete" />
 
 </LinearLayout>

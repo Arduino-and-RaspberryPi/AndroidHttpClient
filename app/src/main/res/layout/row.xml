@@ -30,6 +30,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:layout_below="@+id/textViewIP"
         android:layout_marginTop="5dp"
         android:text="Port" />
@@ -40,22 +42,9 @@
         android:layout_width="102dp"
         android:layout_height="24dp"
         android:textColor="#000000"
-        android:layout_alignTop="@+id/editButton"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:id="@+id/editButton"
-        android:layout_width="80dp"
-        android:layout_height="26dp"
-        android:background="#FFD7D7D7"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:text="Edit"
-        android:textColor="#0099CC"
-        android:layout_marginRight="7dp"
-        android:layout_alignTop="@+id/textViewName"
-        android:layout_toLeftOf="@+id/powerSwitch"
-        android:layout_toStartOf="@+id/powerSwitch" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

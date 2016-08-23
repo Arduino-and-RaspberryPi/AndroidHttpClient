@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -47,9 +45,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         serverList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    final int position, long id) {
-                Log.i("List View Clicked", "**********");
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                viewServers(position);
                 Toast.makeText(MainActivity.this,
                         "List View Clicked:" + position, Toast.LENGTH_SHORT)
                         .show();
@@ -60,14 +57,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     protected void createDatabase(){
         db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)));");
+//        db.execSQL("DROP TABLE servers;");
+        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)), CONSTRAINT name_unique UNIQUE (name));");
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
 
     private void getResults() {
         Cursor cursor = db.rawQuery(SELECT_SQL, null);
@@ -87,6 +85,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void showAddServers(){
         Intent intent = new Intent(this,AddServer.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void viewServers(int position){
+        Intent intent = new Intent(this,ViewServers.class);
+        intent.putExtra("SERVER", position);
         startActivity(intent);
         finish();
     }
