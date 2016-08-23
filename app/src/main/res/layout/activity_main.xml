@@ -34,8 +34,8 @@
         android:elevation="3dp"
         android:fontFamily="sans-serif-light"
         android:textColor="#FFF"
-        android:layout_marginBottom="3dp"
-        android:layout_marginRight="3dp"
+        android:layout_marginBottom="6dp"
+        android:layout_marginRight="6dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />

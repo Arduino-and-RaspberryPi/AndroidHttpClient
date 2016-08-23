@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,14 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class ViewServers extends ActionBarActivity implements View.OnClickListener{
     private EditText editTextIP;
@@ -38,7 +29,6 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     private SQLiteDatabase db;
 
     private Cursor cursor;
-    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +38,6 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         openDatabase();
 
         findViewsById();
-        button.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         btnPrev.setOnClickListener(this);
         btnSave.setOnClickListener(this);
@@ -81,8 +70,6 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         btnNext = (Button) findViewById(R.id.btnNext);
         btnSave = (Button) findViewById(R.id.btnSave);
         btnDelete = (Button) findViewById(R.id.btnDelete);
-
-        button = (Button) findViewById(R.id.button);
     }
 
     protected void openDatabase() {
@@ -221,64 +208,6 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         if (view == btnDelete) {
             deleteRecord();
         }
-        if (view == button) {
-            String ip = editTextIP.getText().toString().trim();
-            String port = editTextPort.getText().toString().trim();
-            String URL = "http://"+ip+":"+port+"/on$";
-            HttpGetRequest task = new HttpGetRequest();
-            task.execute(new String[] { URL });
-        }
     }
 
-    private class HttpGetRequest extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... urls) {
-            String output = null;
-            for (String url : urls) {
-                output = getOutputFromUrl(url);
-            }
-            return output;
-        }
-
-        private String getOutputFromUrl(String url) {
-            StringBuffer output = new StringBuffer("");
-            try {
-                InputStream stream = getHttpConnection(url);
-                BufferedReader buffer = new BufferedReader(
-                        new InputStreamReader(stream));
-                String s = "";
-                while ((s = buffer.readLine()) != null)
-                    output.append(s);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            return output.toString();
-        }
-
-        // Makes HttpURLConnection and returns InputStream
-        private InputStream getHttpConnection(String urlString) throws IOException {
-            InputStream stream = null;
-            URL url = new URL(urlString);
-            URLConnection connection = url.openConnection();
-
-            try {
-                HttpURLConnection httpConnection = (HttpURLConnection) connection;
-                httpConnection.setRequestMethod("GET");
-                httpConnection.connect();
-
-                if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    stream = httpConnection.getInputStream();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return stream;
-        }
-
-//        @Override
-//        protected void onPostExecute(String output) {
-//            outputText.setText(output);
-//        }
-    }
 }

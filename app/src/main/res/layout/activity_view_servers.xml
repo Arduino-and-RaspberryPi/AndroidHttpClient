@@ -100,10 +100,4 @@
         android:text="Delete"
         android:id="@+id/btnDelete" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button" />
-
 </LinearLayout>

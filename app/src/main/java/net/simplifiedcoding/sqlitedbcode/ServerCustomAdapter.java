@@ -1,9 +1,17 @@
 package net.simplifiedcoding.sqlitedbcode;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -67,14 +75,20 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 openDatabase();
                 if(isChecked) {
+                    String URL = "http://"+server.getIp()+":"+server.getPort()+"/on$";
+                    HttpGetRequest task = new HttpGetRequest();
+                    task.execute(new String[] { URL });
                     String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
-                                server.getIp() + "' AND port='" + server.getPort() +"';";
+                            server.getIp() + "' AND port='" + server.getPort() +"';";
                     db.execSQL(sql);
                     Toast.makeText(context,
                             "Power is ON",
                             Toast.LENGTH_SHORT).show();
                 }
                 else {
+                    String URL = "http://"+server.getIp()+":"+server.getPort()+"/off$";
+                    HttpGetRequest task = new HttpGetRequest();
+                    task.execute(new String[] { URL });
                     String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
                             server.getIp() + "' AND port='" + server.getPort() +"';";
                     db.execSQL(sql);
@@ -99,5 +113,57 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         TextView textPort;
         Button editButton;
         Switch powerSwitch;
+    }
+
+    private class HttpGetRequest extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... urls) {
+            String output = null;
+            for (String url : urls) {
+                output = getOutputFromUrl(url);
+            }
+            return output;
+        }
+
+        private String getOutputFromUrl(String url) {
+            StringBuffer output = new StringBuffer("");
+            try {
+                InputStream stream = getHttpConnection(url);
+                BufferedReader buffer = new BufferedReader(
+                        new InputStreamReader(stream));
+                String s = "";
+                while ((s = buffer.readLine()) != null)
+                    output.append(s);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            return output.toString();
+        }
+
+        // Makes HttpURLConnection and returns InputStream
+        private InputStream getHttpConnection(String urlString) throws IOException {
+            InputStream stream = null;
+            URL url = new URL(urlString);
+            URLConnection connection = url.openConnection();
+
+            try {
+                HttpURLConnection httpConnection = (HttpURLConnection) connection;
+                httpConnection.setRequestMethod("GET");
+                httpConnection.connect();
+
+                if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    stream = httpConnection.getInputStream();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return stream;
+        }
+
+//        @Override
+//        protected void onPostExecute(String output) {
+//            outputText.setText(output);
+//        }
     }
 }
