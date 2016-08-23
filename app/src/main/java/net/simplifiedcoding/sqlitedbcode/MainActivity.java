@@ -47,9 +47,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 viewServers(position);
-                Toast.makeText(MainActivity.this,
-                        "List View Clicked:" + position, Toast.LENGTH_SHORT)
-                        .show();
             }
         });
 
