@@ -10,14 +10,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class ViewServers extends ActionBarActivity implements View.OnClickListener{
+public class EditServer extends ActionBarActivity implements View.OnClickListener{
     private EditText editTextIP;
     private EditText editTextName;
     private EditText editTextPort;
     private EditText editTextStatus;
-    private EditText editTextId;
+    private TextView serverID;
     private Button btnPrev;
     private Button btnNext;
     private Button btnSave;
@@ -34,7 +35,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_servers);
+        setContentView(R.layout.activity_edit_server);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initializeViews();
 
@@ -61,7 +62,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
     }
 
     private void initializeViews() {
-        editTextId = (EditText) findViewById(R.id.editTextId);
+        serverID = (TextView) findViewById(R.id.serverID);
         editTextName = (EditText) findViewById(R.id.editTextName);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
@@ -88,7 +89,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         String ip = cursor.getString(cursor.getColumnIndex("ip"));
         String port = cursor.getString(cursor.getColumnIndex("port"));
         int status = cursor.getInt(cursor.getColumnIndex("status"));
-        editTextId.setText(id);
+        serverID.setText(id);
         editTextName.setText(name);
         editTextIP.setText(ip);
         editTextPort.setText(port);
@@ -136,7 +137,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
 
 
     protected void saveRecord() {
-        String id = editTextId.getText().toString().trim();
+        String id = serverID.getText().toString().trim();
         String ip = editTextIP.getText().toString().trim();
         String name = editTextName.getText().toString().trim();
         String port = editTextPort.getText().toString().trim();
@@ -163,7 +164,7 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
-                        String id = editTextId.getText().toString().trim();
+                        String id = serverID.getText().toString().trim();
 
                         String sql = "DELETE FROM servers WHERE id=" + id + ";";
                         db.execSQL(sql);

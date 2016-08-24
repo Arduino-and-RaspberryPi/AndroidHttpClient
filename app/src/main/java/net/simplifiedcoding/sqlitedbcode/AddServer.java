@@ -64,7 +64,7 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
     }
 
     private void showServers(){
-        Intent intent = new Intent(this,ViewServers.class);
+        Intent intent = new Intent(this,EditServer.class);
         startActivity(intent);
         finish();
     }

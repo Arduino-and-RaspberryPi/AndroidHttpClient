@@ -19,8 +19,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ViewServers"
-            android:label="@string/title_activity_view_servers"
+            android:name=".EditServer"
+            android:label="@string/title_activity_edit_server"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
