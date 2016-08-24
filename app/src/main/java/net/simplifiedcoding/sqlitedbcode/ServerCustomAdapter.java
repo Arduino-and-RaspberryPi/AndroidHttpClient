@@ -27,6 +27,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     int layoutResourceId;
 
     private SQLiteDatabase db;
+    private String httpResponse = null;
 
     ArrayList<Server> data = new ArrayList<Server>();
 
@@ -59,7 +60,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         holder.textName.setText(server.getName());
         holder.textIP.setText(server.getIp());
         holder.textPort.setText(server.getPort());
-        Boolean switchStatus = server.getStatus() == 1 ? true : false;
+        final Boolean switchStatus = server.getStatus() == 1 ? true : false;
         holder.powerSwitch.setChecked(switchStatus);
         holder.powerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -69,22 +70,29 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                     String URL = "http://" + server.getIp() + ":" + server.getPort() + "/on$";
                     HttpGetRequest task = new HttpGetRequest();
                     task.execute(new String[]{URL});
-                    String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
-                            server.getIp() + "' AND port='" + server.getPort() + "';";
-                    db.execSQL(sql);
-                    Toast.makeText(context,
-                            "Power is ON at " + URL,
-                            Toast.LENGTH_SHORT).show();
-                } else {
+                    if(httpResponse != null && !httpResponse.isEmpty()) {
+                        String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
+                                server.getIp() + "' AND port='" + server.getPort() + "';";
+                        db.execSQL(sql);
+                        showMessage("Power is ON at " + URL);
+                    }
+                    else{
+                        showMessage("Server is not responding or you are offline.");
+                    }
+                }
+                else {
                     String URL = "http://" + server.getIp() + ":" + server.getPort() + "/off$";
                     HttpGetRequest task = new HttpGetRequest();
                     task.execute(new String[]{URL});
-                    String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
-                            server.getIp() + "' AND port='" + server.getPort() + "';";
-                    db.execSQL(sql);
-                    Toast.makeText(context,
-                            "Power is OFF at " + URL,
-                            Toast.LENGTH_SHORT).show();
+                    if(httpResponse != null && !httpResponse.isEmpty()) {
+                        String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
+                                server.getIp() + "' AND port='" + server.getPort() + "';";
+                        db.execSQL(sql);
+                        showMessage("Power is OFF at " + URL);
+                    }
+                    else{
+                        showMessage("Server is not responding or you are offline.");
+                    }
                 }
                 db.close();
             }
@@ -104,19 +112,23 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         Switch powerSwitch;
     }
 
+    private void showMessage(String message){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
     private class HttpGetRequest extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... urls) {
             try {
-                String output = null;
                 for (String url : urls) {
-                    output = getOutputFromUrl(url);
+                    httpResponse = getOutputFromUrl(url);
                 }
-                return output;
+                return httpResponse;
             }
             catch (Exception ex){
                 ex.printStackTrace();
+                showMessage("Server is not responding");
             }
             return null;
         }
@@ -132,6 +144,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                     output.append(s);
             } catch (IOException ex) {
                 ex.printStackTrace();
+                showMessage("Server is not responding");
             }
             return output.toString();
         }
@@ -152,15 +165,9 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                showMessage("Server is not responding");
             }
             return stream;
-        }
-
-        @Override
-        protected void onPostExecute(String output) {
-            Toast.makeText(context,
-                    "Server is not responding",
-                    Toast.LENGTH_SHORT).show();
         }
     }
 }
