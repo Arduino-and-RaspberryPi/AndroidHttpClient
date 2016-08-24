@@ -47,7 +47,7 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         String ip = editTextIP.getText().toString().trim();
         String port = editTextPort.getText().toString().trim();
         String status = "0";
-        if(name.equals("") || ip.equals("") || port.equals("")){
+        if(name.equals("") || ip.equals("")){
             Toast.makeText(getApplicationContext(),"Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
