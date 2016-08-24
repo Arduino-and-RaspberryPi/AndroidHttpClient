@@ -140,11 +140,11 @@ public class ViewServers extends ActionBarActivity implements View.OnClickListen
         String ip = editTextIP.getText().toString().trim();
         String name = editTextName.getText().toString().trim();
         String port = editTextPort.getText().toString().trim();
-        String status = editTextStatus.getText().toString().trim();
+        String status = editTextStatus.getText().toString().trim().equals("ON") ? "1" : "0";
 
         String sql = "UPDATE servers SET name='" + name + "',ip='" + ip + "', port='" + port + "', status='" + status + "' WHERE id=" + id + ";";
 
-        if (ip.equals("") || port.equals("")) {
+        if (name.equals("") || ip.equals("") || port.equals("")) {
             Toast.makeText(getApplicationContext(), "You cannot save blank values", Toast.LENGTH_SHORT).show();
             return;
         }
