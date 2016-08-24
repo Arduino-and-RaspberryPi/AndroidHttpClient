@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">AndroidHttpClient</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_view_servers">ViewAll</string>
-    <string name="title_activity_add_server">AddServer</string>
-    <string name="button">On/Off</string>
+    <string name="title_activity_edit_server">Edit Server Settings</string>
+    <string name="title_activity_add_server">Add New Server</string>
 </resources>

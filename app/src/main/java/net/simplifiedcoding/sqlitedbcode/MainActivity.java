@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -87,7 +86,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void viewServers(int position){
-        Intent intent = new Intent(this,ViewServers.class);
+        Intent intent = new Intent(this,EditServer.class);
         intent.putExtra("SERVER", position);
         startActivity(intent);
         finish();
