@@ -1,7 +1,6 @@
 package net.simplifiedcoding.sqlitedbcode;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -15,7 +14,6 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
     private EditText editTextIP;
     private EditText editTextPort;
     private Button btnAdd;
-    private Button btnView;
 
     private SQLiteDatabase db;
 
@@ -24,6 +22,7 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_server);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         initializeViews();
     }
@@ -32,21 +31,18 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         editTextName = (EditText) findViewById(R.id.editTextName);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
-
         btnAdd = (Button) findViewById(R.id.btnAdd);
-        btnView = (Button) findViewById(R.id.btnView);
 
         btnAdd.setOnClickListener(this);
-        btnView.setOnClickListener(this);
     }
 
 
-    protected void openOrCreateDatabase(){
+    protected void openDatabase(){
         db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
     }
 
     protected void insertIntoDB(){
-        openOrCreateDatabase();
+        openDatabase();
         String name = editTextName.getText().toString().trim();
         String ip = editTextIP.getText().toString().trim();
         String port = editTextPort.getText().toString().trim();
@@ -63,24 +59,15 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         Toast.makeText(getApplicationContext(),"Saved Successfully", Toast.LENGTH_SHORT).show();
     }
 
-    private void showServers(){
-        Intent intent = new Intent(this,EditServer.class);
-        startActivity(intent);
-        finish();
-    }
-
     @Override
     public void onBackPressed() {
-        moveTaskToBack(true);
+        super.onBackPressed();
     }
 
     @Override
     public void onClick(View v) {
         if(v == btnAdd){
             insertIntoDB();
-        }
-        if (v == btnView) {
-            showServers();
         }
     }
 }

@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        createDatabase();
+        openOrCreateDatabase();
 
         addNew = (Button) findViewById(R.id.addNew);
         addNew.setOnClickListener(this);
@@ -51,17 +51,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
-    protected void createDatabase(){
+    protected void openOrCreateDatabase(){
         db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
-//        db.execSQL("DROP TABLE servers;");
         db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)), CONSTRAINT name_unique UNIQUE (name));");
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
 
     private void getResults() {
         Cursor cursor = db.rawQuery(SELECT_SQL, null);
@@ -82,14 +75,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void showAddServers(){
         Intent intent = new Intent(this,AddServer.class);
         startActivity(intent);
-        finish();
     }
 
     private void viewServers(int position){
         Intent intent = new Intent(this,EditServer.class);
         intent.putExtra("SERVER", position);
         startActivity(intent);
-        finish();
     }
 
     @Override

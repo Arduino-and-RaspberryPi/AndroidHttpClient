@@ -40,15 +40,8 @@
         android:id="@+id/editTextPort" />
 
     <Button
-        style="?android:attr/buttonStyleSmall"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Add"
         android:id="@+id/btnAdd" />
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="View All"
-        android:id="@+id/btnView" />
 </LinearLayout>

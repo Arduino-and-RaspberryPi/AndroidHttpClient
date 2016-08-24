@@ -73,7 +73,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                             server.getIp() + "' AND port='" + server.getPort() + "';";
                     db.execSQL(sql);
                     Toast.makeText(context,
-                            "Power is ON",
+                            "Power is ON at " + URL,
                             Toast.LENGTH_SHORT).show();
                 } else {
                     String URL = "http://" + server.getIp() + ":" + server.getPort() + "/off$";
@@ -83,7 +83,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                             server.getIp() + "' AND port='" + server.getPort() + "';";
                     db.execSQL(sql);
                     Toast.makeText(context,
-                            "Power is OFF",
+                            "Power is OFF at " + URL,
                             Toast.LENGTH_SHORT).show();
                 }
                 db.close();
