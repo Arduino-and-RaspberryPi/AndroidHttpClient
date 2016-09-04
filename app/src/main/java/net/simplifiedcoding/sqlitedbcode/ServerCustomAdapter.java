@@ -22,12 +22,16 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+
 public class ServerCustomAdapter extends ArrayAdapter<Server> {
     Context context;
     int layoutResourceId;
 
     private SQLiteDatabase db;
     private String httpResponse = null;
+    private OkHttpClient client = new OkHttpClient();
 
     ArrayList<Server> data = new ArrayList<Server>();
 
@@ -66,29 +70,27 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 openDatabase();
+                String ip = server.getIp();
+                int port = Integer.parseInt(server.getPort());
                 if (isChecked) {
-                    String URL = "http://" + server.getIp() + ":" + server.getPort() + "/on$";
-                    HttpGetRequest task = new HttpGetRequest();
-                    task.execute(new String[]{URL});
+                    loadContent("http", ip, port, "on$");
                     if(httpResponse != null && !httpResponse.isEmpty()) {
                         String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
                                 server.getIp() + "' AND port='" + server.getPort() + "';";
                         db.execSQL(sql);
-                        showMessage("Power is ON at " + URL);
+                        showMessage("Power is ON at " + ip+":"+port);
                     }
                     else{
                         showMessage("Server is not responding or you are offline.");
                     }
                 }
                 else {
-                    String URL = "http://" + server.getIp() + ":" + server.getPort() + "/off$";
-                    HttpGetRequest task = new HttpGetRequest();
-                    task.execute(new String[]{URL});
+                    loadContent("http", ip, port, "off$");
                     if(httpResponse != null && !httpResponse.isEmpty()) {
                         String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
                                 server.getIp() + "' AND port='" + server.getPort() + "';";
                         db.execSQL(sql);
-                        showMessage("Power is OFF at " + URL);
+                        showMessage("Power is OFF at " +  ip+":"+port);
                     }
                     else{
                         showMessage("Server is not responding or you are offline.");
@@ -116,58 +118,18 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
-    private class HttpGetRequest extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... urls) {
-            try {
-                for (String url : urls) {
-                    httpResponse = getOutputFromUrl(url);
+    private void loadContent(final String requestType, final String url, final int port, final String path) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    HttpUrl httpUrl = RequestBuilder.buildURL(requestType, url, port, path);
+                    httpResponse = ApiCall.GET(client, httpUrl);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                return httpResponse;
+                return null;
             }
-            catch (Exception ex){
-                ex.printStackTrace();
-                showMessage("Server is not responding");
-            }
-            return null;
-        }
-
-        private String getOutputFromUrl(String url) {
-            StringBuffer output = new StringBuffer("");
-            try {
-                InputStream stream = getHttpConnection(url);
-                BufferedReader buffer = new BufferedReader(
-                        new InputStreamReader(stream));
-                String s = "";
-                while ((s = buffer.readLine()) != null)
-                    output.append(s);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                showMessage("Server is not responding");
-            }
-            return output.toString();
-        }
-
-        // Makes HttpURLConnection and returns InputStream
-        private InputStream getHttpConnection(String urlString) throws IOException {
-            InputStream stream = null;
-            URL url = new URL(urlString);
-            URLConnection connection = url.openConnection();
-
-            try {
-                HttpURLConnection httpConnection = (HttpURLConnection) connection;
-                httpConnection.setRequestMethod("GET");
-                httpConnection.connect();
-
-                if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    stream = httpConnection.getInputStream();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                showMessage("Server is not responding");
-            }
-            return stream;
-        }
+        }.execute();
     }
 }
