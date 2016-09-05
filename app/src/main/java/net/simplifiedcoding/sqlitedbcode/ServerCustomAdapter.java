@@ -1,12 +1,6 @@
 package net.simplifiedcoding.sqlitedbcode;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -64,7 +58,9 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         holder.textName.setText(server.getName());
         holder.textIP.setText(server.getIp());
         holder.textPort.setText(server.getPort());
-        final Boolean switchStatus = server.getStatus() == 1 ? true : false;
+        Boolean switchStatus = server.getStatus() == 1 ? true : false;
+        String status = getSwitchStatus(server.getIp(), Integer.parseInt(server.getPort()));
+        switchStatus = status.isEmpty() ? switchStatus : status.equals("1");
         holder.powerSwitch.setChecked(switchStatus);
         holder.powerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -114,16 +110,27 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         Switch powerSwitch;
     }
 
+    private String getSwitchStatus(String ip, int port){
+        loadContent("http", ip, port, "status$");
+        if(httpResponse != null && !httpResponse.isEmpty()) {
+            int startPosition = httpResponse.indexOf("<html>") + "<html>".length();
+            int endPosition = httpResponse.indexOf("</html>", startPosition);
+            String status = httpResponse.substring(startPosition, endPosition);
+            return status.substring(status.length() -1);
+        }
+        return "";
+    }
+
     private void showMessage(String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void loadContent(final String requestType, final String url, final int port, final String path) {
+    private void loadContent(final String requestType, final String ip, final int port, final String path) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    HttpUrl httpUrl = RequestBuilder.buildURL(requestType, url, port, path);
+                    HttpUrl httpUrl = RequestBuilder.buildURL(requestType, ip, port, path);
                     httpResponse = ApiCall.GET(client, httpUrl);
                 } catch (IOException e) {
                     e.printStackTrace();
