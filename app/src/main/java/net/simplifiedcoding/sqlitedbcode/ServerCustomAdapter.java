@@ -112,6 +112,8 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
 
     private String getSwitchStatus(String ip, int port){
         loadContent("http", ip, port, "status$");
+        try { Thread.sleep(3000); }
+        catch (InterruptedException e) { e.printStackTrace(); }
         if(httpResponse != null && !httpResponse.isEmpty()) {
             int startPosition = httpResponse.indexOf("<html>") + "<html>".length();
             int endPosition = httpResponse.indexOf("</html>", startPosition);
