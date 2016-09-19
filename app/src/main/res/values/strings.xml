@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AndroidHttpClient</string>
+    <string name="app_name">ESPHttpClient</string>
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_edit_server">Edit Server Settings</string>
