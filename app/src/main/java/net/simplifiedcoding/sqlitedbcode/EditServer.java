@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -53,9 +54,7 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(),
-                            "No records found.",
-                            Toast.LENGTH_SHORT).show();
+                    showMessage("No records found.");
                 }
             });
         }
@@ -107,9 +106,7 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(),
-                            "No next records found.",
-                            Toast.LENGTH_SHORT).show();
+                    showMessage("No next records found.");
                 }
             });
         }
@@ -126,9 +123,7 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(),
-                            "No previous records found.",
-                            Toast.LENGTH_SHORT).show();
+                    showMessage("No previous records found.");
                 }
             });
         }
@@ -146,12 +141,12 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
         String sql = "UPDATE servers SET name='" + name + "',ip='" + ip + "', port='" + port + "', status='" + status + "' WHERE id=" + id + ";";
 
         if (name.equals("") || ip.equals("") || port.equals("")) {
-            Toast.makeText(getApplicationContext(), "You cannot save blank values", Toast.LENGTH_SHORT).show();
+            showMessage("You cannot save blank values.");
             return;
         }
 
         db.execSQL(sql);
-        Toast.makeText(getApplicationContext(), "Records Saved Successfully", Toast.LENGTH_SHORT).show();
+        showMessage("Records Saved Successfully.");
         cursor = db.rawQuery(SELECT_SQL, null);
         cursor.moveToPosition(Integer.parseInt(id));
     }
@@ -168,7 +163,7 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
 
                         String sql = "DELETE FROM servers WHERE id=" + id + ";";
                         db.execSQL(sql);
-                        Toast.makeText(getApplicationContext(), "Record Deleted", Toast.LENGTH_SHORT).show();
+                        showMessage("Record Deleted.");
                         cursor = db.rawQuery(SELECT_SQL, null);
                     }
                 });
@@ -211,4 +206,11 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
         }
     }
 
+    private void showMessage(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        View view = toast.getView();
+        view.setBackgroundResource(R.drawable.toast_background_color);
+        toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.show();
+    }
 }

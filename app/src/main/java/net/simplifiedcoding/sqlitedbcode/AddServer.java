@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,15 +49,20 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         String port = editTextPort.getText().toString().trim();
         String status = "0";
         if(name.equals("") || ip.equals("")){
-            Toast.makeText(getApplicationContext(),"Please fill all fields", Toast.LENGTH_SHORT).show();
+            showMessage("Please fill all fields.");
             return;
         }
 
         String query = "INSERT INTO servers (name, ip, port, status" +
                 ") VALUES('"+name+"', '"+ip+"', '"+port+"', '"+status+"');";
-        db.execSQL(query);
-        db.close();
-        Toast.makeText(getApplicationContext(),"Saved Successfully", Toast.LENGTH_SHORT).show();
+        try {
+            db.execSQL(query);
+            db.close();
+            showMessage("Saved Successfully.");
+        }
+        catch (Exception ex){
+            showMessage("Record with this name already exist.");
+        }
     }
 
     @Override
@@ -69,5 +75,13 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         if(v == btnAdd){
             insertIntoDB();
         }
+    }
+
+    private void showMessage(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        View view = toast.getView();
+        view.setBackgroundResource(R.drawable.toast_background_color);
+        toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.show();
     }
 }
