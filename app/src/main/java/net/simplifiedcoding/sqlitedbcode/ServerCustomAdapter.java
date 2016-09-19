@@ -92,6 +92,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                         showMessage("Server is not responding or you are offline.");
                     }
                 }
+                httpResponse = null;
                 db.close();
             }
         });
