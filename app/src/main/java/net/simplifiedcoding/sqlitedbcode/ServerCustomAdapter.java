@@ -69,7 +69,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 String ip = server.getIp();
                 int port = Integer.parseInt(server.getPort());
                 if (isChecked) {
-                    loadContent("http", ip, port, "on$");
+                    loadContent("http", ip, port, "on");
                     if(httpResponse != null && !httpResponse.isEmpty()) {
                         String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
                                 server.getIp() + "' AND port='" + server.getPort() + "';";
@@ -81,7 +81,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                     }
                 }
                 else {
-                    loadContent("http", ip, port, "off$");
+                    loadContent("http", ip, port, "off");
                     if(httpResponse != null && !httpResponse.isEmpty()) {
                         String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
                                 server.getIp() + "' AND port='" + server.getPort() + "';";
@@ -111,7 +111,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     }
 
     private String getSwitchStatus(String ip, int port){
-        loadContent("http", ip, port, "status$");
+        loadContent("http", ip, port, "status");
         try { Thread.sleep(3000); }
         catch (InterruptedException e) { e.printStackTrace(); }
         if(httpResponse != null && !httpResponse.isEmpty()) {
