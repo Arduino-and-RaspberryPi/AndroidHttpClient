@@ -9,7 +9,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ApiCall {
-    //GET network request
+
     public static String GET(OkHttpClient client, HttpUrl url) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
@@ -18,7 +18,6 @@ public class ApiCall {
         return response.body().string();
     }
 
-    //POST network request
     public static String POST(OkHttpClient client, HttpUrl url, RequestBody body) throws IOException {
         Request request = new Request.Builder()
                 .url(url)

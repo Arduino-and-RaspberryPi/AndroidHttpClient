@@ -2,6 +2,7 @@ package net.simplifiedcoding.sqlitedbcode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,8 +25,10 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     int layoutResourceId;
 
     private SQLiteDatabase db;
-    private String httpResponse = null;
-    private OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client = new OkHttpClient()
+                                 .newBuilder()
+                                 .connectTimeout(500, TimeUnit.MILLISECONDS)
+                                 .build();
 
     ArrayList<Server> data = new ArrayList<Server>();
 
@@ -68,31 +71,10 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 openDatabase();
                 String ip = server.getIp();
                 int port = Integer.parseInt(server.getPort());
-                if (isChecked) {
-                    loadContent("http", ip, port, "on");
-                    if(httpResponse != null && !httpResponse.isEmpty()) {
-                        String sql = "UPDATE servers SET status=" + 1 + " WHERE ip='" +
-                                server.getIp() + "' AND port='" + server.getPort() + "';";
-                        db.execSQL(sql);
-                        showMessage("Power is ON at " + ip+":"+port);
-                    }
-                    else{
-                        showMessage("Server is not responding or you are offline.");
-                    }
-                }
-                else {
-                    loadContent("http", ip, port, "off");
-                    if(httpResponse != null && !httpResponse.isEmpty()) {
-                        String sql = "UPDATE servers SET status=" + 0 + " WHERE ip='" +
-                                server.getIp() + "' AND port='" + server.getPort() + "';";
-                        db.execSQL(sql);
-                        showMessage("Power is OFF at " +  ip+":"+port);
-                    }
-                    else{
-                        showMessage("Server is not responding or you are offline.");
-                    }
-                }
-                httpResponse = null;
+                if (isChecked)
+                    updateSwitchStatus(ip, port, "on");
+                else
+                    updateSwitchStatus(ip, port, "off");
                 db.close();
             }
         });
@@ -111,35 +93,60 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         Switch powerSwitch;
     }
 
-    private String getSwitchStatus(String ip, int port){
-        loadContent("http", ip, port, "status");
-        try { Thread.sleep(3000); }
-        catch (InterruptedException e) { e.printStackTrace(); }
+    private void updateSwitchStatus(String ip, int port,String status){
+        String httpResponse = loadContent("http", ip, port, status);
         if(httpResponse != null && !httpResponse.isEmpty()) {
-            int startPosition = httpResponse.indexOf("<html>") + "<html>".length();
-            int endPosition = httpResponse.indexOf("</html>", startPosition);
-            String status = httpResponse.substring(startPosition, endPosition);
-            return status.substring(status.length() -1);
+            int newStatus = status.equals("on") ? 1 : 0;
+            String sql = "UPDATE servers SET status=" + newStatus + " WHERE ip='" +
+                    ip + "' AND port='" + port + "';";
+            db.execSQL(sql);
+            showMessage("Power is ON at " + ip+":"+port);
         }
-        return "";
+        else{
+            showMessage("Server is not responding or you are offline.");
+        }
+    }
+
+    private String getSwitchStatus(String ip, int port){
+        String httpResponse = loadContent("http", ip, port, "status");
+        String status = "";
+        if(httpResponse != null && !httpResponse.isEmpty()) {
+            status = getStatusFromResponse(httpResponse);
+        }
+        return status;
+    }
+
+    private String getStatusFromResponse(String httpResponse){
+        int startPosition = httpResponse.indexOf("<html>") + "<html>".length();
+        int endPosition = httpResponse.indexOf("</html>", startPosition);
+        String status = httpResponse.substring(startPosition, endPosition);
+        return status.substring(status.length() -1);
     }
 
     private void showMessage(String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void loadContent(final String requestType, final String ip, final int port, final String path) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    HttpUrl httpUrl = RequestBuilder.buildURL(requestType, ip, port, path);
-                    httpResponse = ApiCall.GET(client, httpUrl);
-                } catch (IOException e) {
-                    e.printStackTrace();
+    private String loadContent(final String requestType, final String ip, final int port, final String path) {
+        String response = "";
+        try {
+            response = new AsyncTask<String, Integer, String>() {
+
+                @Override
+                protected String doInBackground(String... params) {
+                    String httpResponse = "";
+                    try {
+                        HttpUrl httpUrl = RequestBuilder.buildURL(requestType, ip, port, path);
+                        httpResponse = ApiCall.GET(client, httpUrl);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return httpResponse;
                 }
-                return null;
-            }
-        }.execute();
+            }.execute().get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 }
