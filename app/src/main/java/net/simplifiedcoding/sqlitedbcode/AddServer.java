@@ -39,7 +39,7 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
 
 
     protected void openDatabase(){
-        db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
+        db=openOrCreateDatabase("ESPServerDB", Context.MODE_PRIVATE, null);
     }
 
     protected void insertIntoDB(){

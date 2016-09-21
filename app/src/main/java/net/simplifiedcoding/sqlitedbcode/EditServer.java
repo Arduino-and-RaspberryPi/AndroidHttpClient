@@ -79,7 +79,7 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
     }
 
     protected void openDatabase() {
-        db = openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
+        db = openOrCreateDatabase("ESPServerDB", Context.MODE_PRIVATE, null);
     }
 
     protected void showRecords() {

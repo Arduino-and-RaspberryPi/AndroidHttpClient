@@ -59,8 +59,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     protected void openOrCreateDatabase(){
-        db=openOrCreateDatabase("ServerConfigDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)), CONSTRAINT name_unique UNIQUE (name));");
+        db=openOrCreateDatabase("ESPServerDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port VARCHAR, command VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)), CONSTRAINT name_unique UNIQUE (name));");
     }
 
     private void getResults() {

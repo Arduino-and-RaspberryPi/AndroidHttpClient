@@ -83,7 +83,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     }
 
     protected void openDatabase() {
-        db = SQLiteDatabase.openDatabase(context.getDatabasePath("ServerConfigDB").toString(), null, SQLiteDatabase.CREATE_IF_NECESSARY);
+        db = SQLiteDatabase.openDatabase(context.getDatabasePath("ESPServerDB").toString(), null, SQLiteDatabase.CREATE_IF_NECESSARY);
     }
 
     static class ServerHolder {
@@ -100,7 +100,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
             String sql = "UPDATE servers SET status=" + newStatus + " WHERE ip='" +
                     ip + "' AND port='" + port + "';";
             db.execSQL(sql);
-            showMessage("Power is ON at " + ip+":"+port);
+            showMessage("Power is "+status.toUpperCase()+" at " + ip+":"+port);
         }
         else{
             showMessage("Server is not responding or you are offline.");
