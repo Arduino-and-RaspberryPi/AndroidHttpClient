@@ -20,7 +20,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
-    private Menu optionsMenu;
     private Button addNew;
     ServerCustomAdapter serverAdapter;
     ListView serverList;
@@ -28,7 +27,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private SQLiteDatabase db;
     private static final String SELECT_SQL = "SELECT * FROM servers";
 
-    ArrayList<Server> serverArray = new ArrayList<Server>();
+    ArrayList<Server> serverArray = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +59,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     protected void openOrCreateDatabase(){
         db=openOrCreateDatabase("ESPServerDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port VARCHAR, command VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)), CONSTRAINT name_unique UNIQUE (name));");
+        db.execSQL("CREATE TABLE IF NOT EXISTS servers(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name varchar, ip VARCHAR,port int, command VARCHAR, status BOOLEAN NOT NULL CHECK (status IN (0,1)), CONSTRAINT name_unique UNIQUE (name));");
     }
 
     private void getResults() {
@@ -69,9 +68,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             while (cursor.moveToNext()) {
                 String name = cursor.getString(cursor.getColumnIndex("name"));
                 String ip = cursor.getString(cursor.getColumnIndex("ip"));
-                String port = cursor.getString(cursor.getColumnIndex("port"));
+                int port = cursor.getInt(cursor.getColumnIndex("port"));
+                String command = cursor.getString(cursor.getColumnIndex("command"));
                 int status = cursor.getInt(cursor.getColumnIndex("status"));
-                serverArray.add(new Server(name, ip, port, status));
+                serverArray.add(new Server(name, ip, port, status, command));
             }
         }
 
@@ -99,7 +99,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.optionsMenu = menu;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_refresh, menu);
         return super.onCreateOptionsMenu(menu);

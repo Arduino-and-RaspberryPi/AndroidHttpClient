@@ -7,7 +7,7 @@ public class RequestBuilder {
         return new HttpUrl.Builder()
                 .scheme(requestType)
                 .host(host)
-                .addPathSegment(path)
+                .addPathSegments(path)
                 .build();
     }
 
@@ -16,7 +16,7 @@ public class RequestBuilder {
                 .scheme(requestType)
                 .host(host)
                 .port(port)
-                .addPathSegment(path)
+                .addPathSegments(path)
                 .build();
     }
 

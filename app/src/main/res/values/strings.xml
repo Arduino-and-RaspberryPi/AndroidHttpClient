@@ -5,4 +5,13 @@
     <string name="title_activity_edit_server">Edit Server Settings</string>
     <string name="title_activity_add_server">Add New Server</string>
     <string name="menuitem_refresh">Refresh</string>
+    <string name="server_name">Name</string>
+    <string name="ip">Host/IP Address</string>
+    <string name="port">Port</string>
+    <string name="command_path">Command Path</string>
+    <string name="status">Status</string>
+    <string name="edit_text_name_hint">eg: BedRoom1 (mandatory)</string>
+    <string name="edit_text_ip_hint">IP or host name. (mandatory)</string>
+    <string name="edit_text_port_hint">Port number (optional).</string>
+    <string name="edit_text_command_hint">eg: room/fan1/ (optional)</string>
 </resources>

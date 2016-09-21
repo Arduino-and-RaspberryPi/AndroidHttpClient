@@ -60,9 +60,13 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         final Server server = data.get(position);
         holder.textName.setText(server.getName());
         holder.textIP.setText(server.getIp());
-        holder.textPort.setText(server.getPort());
+        int port = server.getPort();
+        if(port == 0)
+            holder.textPort.setText("");
+        else
+            holder.textPort.setText(Integer.toString(port));
         Boolean switchStatus = server.getStatus() == 1 ? true : false;
-        String status = getSwitchStatus(server.getIp(), Integer.parseInt(server.getPort()));
+        String status = getSwitchStatus(server.getIp(), port, server.getCommand());
         switchStatus = status.isEmpty() ? switchStatus : status.equals("1");
         holder.powerSwitch.setChecked(switchStatus);
         holder.powerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -70,11 +74,12 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 openDatabase();
                 String ip = server.getIp();
-                int port = Integer.parseInt(server.getPort());
+                int port = server.getPort();
+                String commandPath = server.getCommand();
                 if (isChecked)
-                    updateSwitchStatus(ip, port, "on");
+                    updateSwitchStatus(ip, port, commandPath, "on");
                 else
-                    updateSwitchStatus(ip, port, "off");
+                    updateSwitchStatus(ip, port, commandPath, "off");
                 db.close();
             }
         });
@@ -93,25 +98,32 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
         Switch powerSwitch;
     }
 
-    private void updateSwitchStatus(String ip, int port,String status){
-        String httpResponse = loadContent("http", ip, port, status);
+    private void updateSwitchStatus(String ip, int port,String commandPath, String status){
+        String httpResponse = loadContent("http", ip, port, commandPath + status);
+        String strPort = port != 0 ? ":"+Integer.toString(port) : "";
         if(httpResponse != null && !httpResponse.isEmpty()) {
             int newStatus = status.equals("on") ? 1 : 0;
             String sql = "UPDATE servers SET status=" + newStatus + " WHERE ip='" +
                     ip + "' AND port='" + port + "';";
             db.execSQL(sql);
-            showMessage("Power is "+status.toUpperCase()+" at " + ip+":"+port);
+            showMessage("Power is "+status.toUpperCase()+" at " + ip + strPort);
         }
         else{
             showMessage("Server is not responding or you are offline.");
         }
     }
 
-    private String getSwitchStatus(String ip, int port){
-        String httpResponse = loadContent("http", ip, port, "status");
+    private String getSwitchStatus(String ip, int port, String commandPath){
+        String httpResponse = loadContent("http", ip, port, commandPath+"status");
         String status = "";
         if(httpResponse != null && !httpResponse.isEmpty()) {
-            status = getStatusFromResponse(httpResponse);
+            try {
+                status = getStatusFromResponse(httpResponse);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                showMessage("Server response is in wrong format.");
+            }
         }
         return status;
     }
@@ -136,7 +148,11 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
                 protected String doInBackground(String... params) {
                     String httpResponse = "";
                     try {
-                        HttpUrl httpUrl = RequestBuilder.buildURL(requestType, ip, port, path);
+                        HttpUrl httpUrl;
+                        if(port != 0)
+                            httpUrl = RequestBuilder.buildURL(requestType, ip, port, path);
+                        else
+                            httpUrl = RequestBuilder.buildURL(requestType, ip, path);
                         httpResponse = ApiCall.GET(client, httpUrl);
                     } catch (IOException e) {
                         e.printStackTrace();

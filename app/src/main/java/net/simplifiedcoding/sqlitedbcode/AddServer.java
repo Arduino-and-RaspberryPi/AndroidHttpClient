@@ -10,10 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class AddServer extends ActionBarActivity implements View.OnClickListener {
     private EditText editTextName;
     private EditText editTextIP;
     private EditText editTextPort;
+    private EditText editTextCommand;
     private Button btnAdd;
 
     private SQLiteDatabase db;
@@ -32,6 +36,7 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         editTextName = (EditText) findViewById(R.id.editTextName);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
+        editTextCommand = (EditText) findViewById(R.id.editTextCommand);
         btnAdd = (Button) findViewById(R.id.btnAdd);
 
         btnAdd.setOnClickListener(this);
@@ -46,23 +51,25 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
         openDatabase();
         String name = editTextName.getText().toString().trim();
         String ip = editTextIP.getText().toString().trim();
-        String port = editTextPort.getText().toString().trim();
+        String command = editTextCommand.getText().toString().trim();
         String status = "0";
+        String strPort = editTextPort.getText().toString().trim();
+        int port = strPort.isEmpty() ? 0 : Integer.parseInt(strPort);
         if(name.equals("") || ip.equals("")){
-            showMessage("Please fill all fields.");
+            showMessage("Please fill all mandatory fields.");
             return;
         }
 
-        String query = "INSERT INTO servers (name, ip, port, status" +
-                ") VALUES('"+name+"', '"+ip+"', '"+port+"', '"+status+"');";
+        String query = "INSERT INTO servers (name, ip, port, command, status" +
+                ") VALUES('"+name+"', '"+ip+"', '"+port+"','"+command+"', '"+status+"');";
         try {
             db.execSQL(query);
-            db.close();
             showMessage("Saved Successfully.");
         }
         catch (Exception ex){
             showMessage("Record with this name already exist.");
         }
+        db.close();
     }
 
     @Override
@@ -71,8 +78,8 @@ public class AddServer extends ActionBarActivity implements View.OnClickListener
     }
 
     @Override
-    public void onClick(View v) {
-        if(v == btnAdd){
+    public void onClick(View view) {
+        if(view == btnAdd){
             insertIntoDB();
         }
     }

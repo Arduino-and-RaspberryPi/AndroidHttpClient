@@ -18,6 +18,7 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
     private EditText editTextIP;
     private EditText editTextName;
     private EditText editTextPort;
+    private EditText editTextCommand;
     private EditText editTextStatus;
     private TextView serverID;
     private Button btnPrev;
@@ -65,6 +66,7 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
         editTextName = (EditText) findViewById(R.id.editTextName);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
+        editTextCommand = (EditText) findViewById(R.id.editTextCommand);
         editTextStatus = (EditText) findViewById(R.id.editTextStatus);
 
         btnPrev = (Button) findViewById(R.id.btnPrev);
@@ -86,47 +88,37 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
         String id = cursor.getString(cursor.getColumnIndex("id"));
         String name = cursor.getString(cursor.getColumnIndex("name"));
         String ip = cursor.getString(cursor.getColumnIndex("ip"));
-        String port = cursor.getString(cursor.getColumnIndex("port"));
+        int port = cursor.getInt(cursor.getColumnIndex("port"));
+        String command = cursor.getString(cursor.getColumnIndex("command"));
         int status = cursor.getInt(cursor.getColumnIndex("status"));
         serverID.setText(id);
         editTextName.setText(name);
         editTextIP.setText(ip);
-        editTextPort.setText(port);
+        editTextCommand.setText(command);
+        if(port != 0)
+            editTextPort.setText(Integer.toString(port));
+        else
+            editTextPort.setText("");
         String switchStatus =  (status == 1) ? "ON" : "OFF";
         editTextStatus.setText(switchStatus);
     }
 
     protected void moveNext() {
-        try {
-            if (!cursor.isLast())
-                cursor.moveToNext();
-
+        if (!cursor.isLast()) {
+            cursor.moveToNext();
             showRecords();
-        } catch (Exception e) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showMessage("No next records found.");
-                }
-            });
         }
-
+        else
+            showMessage("No next records found.");
     }
 
     protected void movePrev() {
-        try {
-            if (!cursor.isFirst())
-                cursor.moveToPrevious();
-
+        if (!cursor.isFirst()) {
+            cursor.moveToPrevious();
             showRecords();
-        } catch (Exception e) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showMessage("No previous records found.");
-                }
-            });
         }
+        else
+            showMessage("No previous records found.");
 
     }
 
@@ -135,12 +127,14 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
         String id = serverID.getText().toString().trim();
         String ip = editTextIP.getText().toString().trim();
         String name = editTextName.getText().toString().trim();
-        String port = editTextPort.getText().toString().trim();
+        String strPort = editTextPort.getText().toString().trim();
+        int port = strPort.isEmpty() ? 0 : Integer.parseInt(strPort);
+        String command = editTextCommand.getText().toString().trim();
         String status = editTextStatus.getText().toString().trim().equals("ON") ? "1" : "0";
 
-        String sql = "UPDATE servers SET name='" + name + "',ip='" + ip + "', port='" + port + "', status='" + status + "' WHERE id=" + id + ";";
+        String sql = "UPDATE servers SET name='" + name + "',ip='" + ip + "', port='" + port + "', command='" + command + "', status='" + status + "' WHERE id=" + id + ";";
 
-        if (name.equals("") || ip.equals("") || port.equals("")) {
+        if (name.equals("") || ip.equals("")) {
             showMessage("You cannot save blank values.");
             return;
         }
