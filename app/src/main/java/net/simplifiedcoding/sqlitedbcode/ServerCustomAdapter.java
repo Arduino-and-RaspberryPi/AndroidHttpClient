@@ -27,7 +27,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     private SQLiteDatabase db;
     private OkHttpClient client = new OkHttpClient()
                                  .newBuilder()
-                                 .connectTimeout(500, TimeUnit.MILLISECONDS)
+                                 .connectTimeout(600, TimeUnit.MILLISECONDS)
                                  .build();
 
     ArrayList<Server> data = new ArrayList<Server>();
@@ -84,7 +84,6 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
             }
         });
         return row;
-
     }
 
     protected void openDatabase() {

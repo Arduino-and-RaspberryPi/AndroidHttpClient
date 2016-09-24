@@ -138,9 +138,13 @@ public class EditServer extends ActionBarActivity implements View.OnClickListene
             showMessage("You cannot save blank values.");
             return;
         }
-
-        db.execSQL(sql);
-        showMessage("Records Saved Successfully.");
+        try {
+            db.execSQL(sql);
+            showMessage("Records Saved Successfully.");
+        }
+        catch (Exception e){
+            showMessage("Record with this name already exist.");
+        }
         cursor = db.rawQuery(SELECT_SQL, null);
         cursor.moveToPosition(Integer.parseInt(id));
     }
