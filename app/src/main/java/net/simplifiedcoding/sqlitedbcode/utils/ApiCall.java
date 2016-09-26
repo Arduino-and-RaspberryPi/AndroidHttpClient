@@ -1,4 +1,4 @@
-package net.simplifiedcoding.sqlitedbcode;
+package net.simplifiedcoding.sqlitedbcode.utils;
 
 import java.io.IOException;
 

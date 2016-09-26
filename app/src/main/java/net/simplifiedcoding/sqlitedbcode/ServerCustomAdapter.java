@@ -1,13 +1,9 @@
 package net.simplifiedcoding.sqlitedbcode;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +13,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
+import net.simplifiedcoding.sqlitedbcode.utils.AsyncRequestTask;
 
 public class ServerCustomAdapter extends ArrayAdapter<Server> {
     Context context;
     int layoutResourceId;
 
     private SQLiteDatabase db;
-    private OkHttpClient client = new OkHttpClient()
-                                 .newBuilder()
-                                 .connectTimeout(600, TimeUnit.MILLISECONDS)
-                                 .build();
 
     ArrayList<Server> data = new ArrayList<Server>();
 
@@ -98,7 +89,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     }
 
     private void updateSwitchStatus(String ip, int port,String commandPath, String status){
-        String httpResponse = loadContent("http", ip, port, commandPath + status);
+        String httpResponse = AsyncRequestTask.makeRequest("http", ip, port, commandPath + status);
         String strPort = port != 0 ? ":"+Integer.toString(port) : "";
         if(httpResponse != null && !httpResponse.isEmpty()) {
             int newStatus = status.equals("on") ? 1 : 0;
@@ -113,7 +104,7 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
     }
 
     private String getSwitchStatus(String ip, int port, String commandPath){
-        String httpResponse = loadContent("http", ip, port, commandPath+"status");
+        String httpResponse = AsyncRequestTask.makeRequest("http", ip, port, commandPath+"status");
         String status = "";
         if(httpResponse != null && !httpResponse.isEmpty()) {
             try {
@@ -136,32 +127,5 @@ public class ServerCustomAdapter extends ArrayAdapter<Server> {
 
     private void showMessage(String message){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private String loadContent(final String requestType, final String ip, final int port, final String path) {
-        String response = "";
-        try {
-            response = new AsyncTask<String, Integer, String>() {
-
-                @Override
-                protected String doInBackground(String... params) {
-                    String httpResponse = "";
-                    try {
-                        HttpUrl httpUrl;
-                        if(port != 0)
-                            httpUrl = RequestBuilder.buildURL(requestType, ip, port, path);
-                        else
-                            httpUrl = RequestBuilder.buildURL(requestType, ip, path);
-                        httpResponse = ApiCall.GET(client, httpUrl);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return httpResponse;
-                }
-            }.execute().get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
     }
 }
